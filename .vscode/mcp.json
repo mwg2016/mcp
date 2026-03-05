@@ -1,0 +1,13 @@
+{
+  "servers": {
+    "shopify-mcp-server": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["build/index.js"],
+      "env": {
+        "SHOPIFY_STORE_DOMAIN": "your-store.myshopify.com",
+        "SHOPIFY_ACCESS_TOKEN": "your-access-token"
+      }
+    }
+  }
+}
