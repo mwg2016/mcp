@@ -28,7 +28,7 @@ async function shopifyRequest(endpoint: string, params?: Record<string, string>)
 
   const response = await fetch(url.toString(), {
     headers: {
-      'X-Shopify-Access-Token': SHOPIFY_ACCESS_TOKEN,
+      'X-Shopify-Access-Token': SHOPIFY_ACCESS_TOKEN!,
       'Content-Type': 'application/json',
     },
   });
@@ -46,23 +46,12 @@ server.registerTool(
   {
     title: "List Products",
     description: "List products from the Shopify store",
-    inputSchema: {
-      type: "object",
-      properties: {
-        limit: {
-          type: "number",
-          description: "Number of products to return (max 250)",
-          default: 50,
-        },
-        page: {
-          type: "number",
-          description: "Page number for pagination",
-          default: 1,
-        },
-      },
-    },
+    inputSchema: z.object({
+      limit: z.number().optional().default(50).describe("Number of products to return (max 250)"),
+      page: z.number().optional().default(1).describe("Page number for pagination"),
+    }),
   },
-  async ({ limit = 50, page = 1 }) => {
+  async ({ limit = 50, page = 1 }: { limit?: number; page?: number }) => {
     try {
       const products = await shopifyRequest('/products.json', {
         limit: Math.min(limit, 250).toString(),
@@ -87,7 +76,7 @@ server.registerTool(
       };
     } catch (error) {
       return {
-        content: [{ type: "text", text: `Error listing products: ${error.message}` }],
+        content: [{ type: "text", text: `Error listing products: ${error instanceof Error ? error.message : String(error)}` }],
         isError: true,
       };
     }
@@ -99,23 +88,12 @@ server.registerTool(
   {
     title: "Search Products",
     description: "Search products by title or handle",
-    inputSchema: {
-      type: "object",
-      properties: {
-        query: {
-          type: "string",
-          description: "Search query for product title or handle",
-        },
-        limit: {
-          type: "number",
-          description: "Number of products to return (max 250)",
-          default: 50,
-        },
-      },
-      required: ["query"],
-    },
+    inputSchema: z.object({
+      query: z.string().describe("Search query for product title or handle"),
+      limit: z.number().optional().default(50).describe("Number of products to return (max 250)"),
+    }),
   },
-  async ({ query, limit = 50 }) => {
+  async ({ query, limit = 50 }: { query: string; limit?: number }) => {
     try {
       // Shopify doesn't have a direct search endpoint, so we'll filter products
       const products = await shopifyRequest('/products.json', {
@@ -145,7 +123,7 @@ server.registerTool(
       };
     } catch (error) {
       return {
-        content: [{ type: "text", text: `Error searching products: ${error.message}` }],
+        content: [{ type: "text", text: `Error searching products: ${error instanceof Error ? error.message : String(error)}` }],
         isError: true,
       };
     }
