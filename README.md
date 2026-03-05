@@ -21,7 +21,11 @@ A Model Context Protocol (MCP) server that provides integration with Shopify for
    npm install
    ```
 
-3. Create a `.env` file with your Shopify credentials:
+3. Copy `.env.example` to `.env` and fill in your Shopify credentials:
+   ```bash
+   cp .env.example .env
+   ```
+   Then edit `.env` with your actual values:
    ```env
    SHOPIFY_STORE_DOMAIN=your-store.myshopify.com
    SHOPIFY_ACCESS_TOKEN=your-access-token
